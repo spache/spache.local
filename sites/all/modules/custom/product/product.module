@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * Product is pending.
+ */
+define('PRODUCT_PENDING', 0);
+ 
+/**
+ * Product is completed.
+ */
+define('PRODUCT_COMPLETED', 1);
+ 
+/**
+ * Product is canceled.
+ */
+define('PRODUCT_CANCELED', 2);
+
+/**
+ * Implements hook_entity_info().
+ */
+function product_entity_info() {
+  $entity = array(
+    'product' => array(
+      'label' => t('Product'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'product',
+      'uri callback' => 'product_uri',
+      'fieldable' => TRUE,
+      'entity keys' => array('id' => 'id'),
+      'bundles' => array(
+        'product_bundle' => array(
+          'label' => t('Product bundle label'),
+          'admin' => array(
+            'path' => 'admin/config/product/products',
+            'access arguments' => array('configure products settings'),
+          ),
+        ),
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full'),
+          'custom settings' => TRUE,
+        ),
+        'teaser' => array(
+          'label' => t('Teaser'),
+          'custom settings' => TRUE,
+        ),
+      ),
+      'module' => 'product',
+    ),
+  );
+  return $entity;
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ */
+function product_uri($product) {
+  return array(
+    'path' => 'product/' . $product->id,
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function product_permission() {
+  return array(
+    'configure products settings' => array(
+      'title' => t('Configure products settings'),
+      'description' => t('Allows users to configure products settings.'),
+      'restrict access' => TRUE,
+    ),
+    'administer products' => array(
+      'title' => t('Administer products'),
+      'restrict access' => TRUE,
+    ),
+    'edit any products' => array(
+      'title' => t('Edit any product'),
+      'restrict access' => TRUE,
+    ),
+    'edit own products' => array(
+      'title' => t('Edit own products'),
+      'restrict access' => TRUE,
+    ),
+    'delete any products' => array(
+      'title' => t('Delete any products'),
+      'restrict access' => TRUE,
+    ),
+    'delete own products' => array(
+      'title' => t('Delete own products'),
+      'restrict access' => TRUE,
+    ),
+    'create products' => array(
+      'title' => t('Create new products'),
+    ),
+    'view products' => array(
+      'title' => t('View products'),
+    ),
+  );
+}

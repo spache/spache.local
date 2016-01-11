@@ -1,0 +1,53 @@
+<?php
+/**
+ * Implements hook_schema().
+ */
+function product_schema() {
+  $schema = array();
+  $schema['product'] = array(
+    'description' => t('The base table for product entity'),
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary key of product entity',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Title of product entity',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'created' => array(
+        'description' => 'The UNIX timestamp when the product entity was created',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'description' => 'Users uid that create product entity',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => 'Primary key of product entity',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'uid' => array('uid'),
+      'product_created' => array('created'),
+      'product_status' => array('status'),
+    ),
+  );
+  return $schema;
+}
