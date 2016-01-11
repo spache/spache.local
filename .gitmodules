@@ -1,0 +1,3 @@
+[submodule "sites/all/modules/contrib/examples"]
+	path = sites/all/modules/contrib/examples
+	url = git://git.drupal.org/project/examples.git
