@@ -1,0 +1,4 @@
+name = Idevels Popups
+description = Module create popups
+core = 7.x
+package = InternetDevels
