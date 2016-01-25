@@ -4,16 +4,15 @@
 * Implements hook_menu().
 */
 function my_popup_menu() {
-  $items['node/%nid/%ctools_js'] = array(
+  $items['first-popup/%ctools_js'] = array(
     'title' => 'My first popup',
-    'page arguments' => array(1, 2),
+    'page arguments' => array(1),
     'access callback' => TRUE,
     'page callback' => 'my_popup_callback',
     'type' => MENU_CALLBACK,
   );
-  $items['node/%nid'] = array(
+  $items['first-popup'] = array(
     'title' => 'My first popup',
-    'page arguments' => array(1),
     'access callback' => TRUE,
     'page callback' => 'my_popup_page',
     'type' => MENU_CALLBACK,
@@ -41,22 +40,19 @@ function id_example_form($form, $form_state) {
 /**
 * Popup’s callback function for form.
 */  
-function my_popup_callback ($nid, $js = NULL) {
+function my_popup_callback ($js = NULL) {
   if (!$js) {
     // Якщо JavaScript вимкнено — то виводимо форму без попапа.
     return drupal_get_form('id_example_form');
   }
-    ctools_include('ajax');
-    ctools_include('modal');
-    ctools_modal_add_js();
+  my_ctools_popup_style();
+
   // Задаємо початкові налаштування форми.
-  $webFormNode = node_load($nid);
-  dsm($webFormNode);
   $form_state = array(
     'ajax' => TRUE,
     'title' => t('Form title'),
   );
-  $output = ctools_modal_form_wrapper('comment_node_article_form', $form_state);
+  $output = ctools_modal_form_wrapper('id_example_form', $form_state);
   print ajax_render($output);
   drupal_exit();
 }
@@ -70,55 +66,46 @@ function my_ctools_popup_style() {
   static $added = FALSE;
   if ($added == FALSE) {
     $added = TRUE;
+    // Підключаємо необхідні бібліотеки
     ctools_include('ajax');
     ctools_include('modal');
     ctools_modal_add_js();
+    // Задаємо налаштування для попапа
     $popup_style = array(
-      'popup-style' => array(
+      'first-popup-style' => array(
         'modalSize' => array(
-          'type' => 'fixed',
-          'width' => 675, 
-          'height' => 700, 
-          // 'addHeight' => 700,
+          'type' => 'fixed', // Тип попапа.
+          'width' => 475, // Ширина
+          'height' => 300, // Висота
+          // 'addHeight' => 700, // Максимальна висота
         ),
         'modalOptions' => array(
-          'opacity' => 0.8, 
-          'background-color' => '#084b57',
+          'opacity' => 0.8, // Прозорість заднього фону
+          'background-color' => '#084b57', // Колір заднього фону
         ),
-        'closeText' => 'Close', // Текст для кнопки «close»
-        'loadingText' => 'Wait', // Текст при завантаженні попапа
+        'closeText' => '', // Текст для кнопки «close»
+        'loadingText' => '', // Текст при завантаженні попапа
         'animation' => 'fadeIn', // Тип анімації
-        'modalTheme' => 'my_popup_style', // Назва теми, яку слід підключити
+        'modalTheme' => 'my_custom_theme', // Назва теми, яку слід підключити
         'animationSpeed' => 'fast', // Швидкість анімації попапа
       ),
     );
     drupal_add_js($popup_style, 'setting'); // Підключаємо налаштування
-    ctools_add_js('my-popup-style', 'my_popup'); 
+    ctools_add_js('my_popup_style', 'my_popup'); 
     // Підключаємо тему (перший параметр – це назва файла теми, другий - назва модуля, в якому цей файл знаходиться)
   }
 }
 
-function my_popup_page($nid) {
-  dsm($nid);
+function my_popup_page() {
   // Підключаємо функцію з налаштуваннями.
-  my_ctools_popup_style();
+
   // Задаємо налаштування для лінка.
-  $href = '/node/' . $nid . '/nojs';
   $link = array(
     '#type' => 'link',
     '#title' => t('Popup link'),
-    '#href' => $href,
-    '#attributes' => array('class' => array('ctools-use-modal',  'ctools-modal-popup-style')),
+    '#href' => 'first-popup/nojs',
+    '#attributes' => array('class' => array('ctools-use-modal',  'ctools-modal-first-popup-style')),
   );
-  // Виводимо лінк
+// Виводимо лінк
   return drupal_render($link);
-}
-
-/**
- * Implements hook_form_alter().
- */
-function my_popup_form_alter(&$form, &$form_state, $form_id) {
-  dsm($form);
-  dsm($form_state);
-  dsm($form_id);
 }
