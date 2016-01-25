@@ -1,0 +1,8 @@
+name = Demo
+description = Demonstrates create custom entity
+package = Custom modules
+core = 7.x
+files[] = product.install
+dependencies[] = entity
+
+

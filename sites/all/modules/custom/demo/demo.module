@@ -1,0 +1,50 @@
+<?php
+/**
+ * Implements hook_entity_info().
+ */
+function demo_entity_info() {
+
+  $info = array();
+
+  $info['project'] = array(
+    'label' => t('Project'),
+    'base table' => 'demo_projects',
+    'entity keys' => array(
+      'id' => 'id',
+      'label' => 'name',
+    ),
+    'module' => 'demo',
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIController',
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function demo_menu() {
+  $items = array();
+  $items['projects'] = array(
+    'title' => 'Print project entities',
+    'access callback' => TRUE,
+    'page callback' => 'my_entity_page',
+  );
+  return $items;
+}
+
+/**
+ * Callback function for projects page.
+ */
+function my_entity_page() {
+  $projects = entity_load('project', array(1, 2, 7));
+  if (!isset($projects[7])) {
+    $entity = entity_create('project', array('id' => 7));
+    $entity->name = t('Spring House');
+    $entity->description = t('Some more lipsum.');
+    $entity->save();
+  }
+  dpm($projects);
+    
+  return 'Some string';
+}
