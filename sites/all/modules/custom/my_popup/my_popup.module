@@ -109,3 +109,8 @@ function my_popup_page() {
 // Виводимо лінк
   return drupal_render($link);
 }
+
+
+/**
+* Unwanted comment.
+*/
