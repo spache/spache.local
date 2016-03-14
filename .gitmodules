@@ -1,3 +1,6 @@
 [submodule "sites/all/modules/contrib/examples"]
 	path = sites/all/modules/contrib/examples
 	url = git://git.drupal.org/project/examples.git
+[submodule "sites/all/modules/contrib/wysiwyg"]
+	path = sites/all/modules/contrib/wysiwyg
+	url = git://git.drupal.org/project/wysiwyg.git
