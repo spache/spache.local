@@ -1,0 +1,229 @@
+<?php
+
+/**
+	* Implements hook_menu()
+	*/
+function mentor_menu() {
+	$items = array();
+	$items['two_step_form'] = array(
+		'title'            => 'Form Title',
+		'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('my_module_form'),
+		'access arguments' => array('administer two_step_form'),
+		'menu_name'        => 'main-menu',
+	); 
+	return $items;
+}
+
+/**
+ * Impements hook_permission()
+ */
+function my_module_permission() {
+	// @todo: add variable.
+	return array(
+		'administer two_step_form' => array(
+			'title' => t('administer two_step_form'), 
+		),
+	);
+}
+
+/**
+ * Build form function.
+ */
+function my_module_form($form, &$form_state) {
+	$form['#prefix'] = '<div id="my-module-form-wrapper">';
+	$form['#suffix'] = '</div>';
+	$form['#tree'] = TRUE;
+
+	$step = empty($form_state['storage']['step']) ? 1 : $form_state['storage']['step'];
+	$form_state['storage']['step'] = $step;
+
+	switch ($step) {
+		case 1:
+			$form['step1'] = array(
+				'#type' => 'fieldset',
+				'#title' => t('First step'),
+			);
+			$form['step1']['fio'] = array(
+				'#type'        => 'textfield',
+				'#title'       => t('Name') . ':',
+		    '#description' => t("Name, Surname, Fathers name"),
+			);
+			if (isset($form_state['values']['step1']['fio'])) {
+        $form['step1']['fio']['#default_value'] = $form_state['values']['step1']['fio'];
+      }
+			$form['step1']['phone'] = array(
+				'#type'         => 'textfield',
+				'#title'        => t('Phone number:'),
+				'#description'  => t("Please enter your phone number"),
+				'#field_prefix' => '+380',
+			);
+			if (isset($form_state['values']['step1']['phone'])) {
+        $form['step1']['phone']['#default_value'] = $form_state['values']['step1']['phone'];
+      }
+			$form['step1']['marital_status'] = array(
+				'#type'    => 'select',
+				'#title'   => t('Marital status:'),
+				'#options' => array(
+					0 => t('single'),
+					1 => t('married'),
+					// 2 => t('separated'),
+					// 3 => t('divorced'),
+				),
+			);
+			if (isset($form_state['values']['step1']['marital_status'])) {
+        $form['step1']['marital_status']['#default_value'] = $form_state['values']['step1']['marital_status'];
+      }
+			$form['step1']['fio_helpmate'] = array(
+				'#type'        => 'textfield',
+				'#title'       => t('Name:'),
+				'#size'        => 40,
+		    '#description' => t("Name, Surname, Fathers name"),
+		    '#maxlength'   => 50,
+		    '#states'      => array(
+			  	'visible' => array(
+			  		'select[name="step1[marital_status]"]' => array('value' => 1),
+			  	),
+				),
+			);
+			if (isset($form_state['values']['step1']['fio_helpmate'])) {
+        $form['step1']['fio_helpmate']['#default_value'] = $form_state['values']['step1']['fio_helpmate'];
+      }
+			$form['step1']['phone_helpmate'] = array(
+				'#type'         => 'textfield',
+				'#title'        => t('Phone number:'),
+				'#description'  => t("Please enter your phone number"),
+				'#size'         => 15,
+				'#field_prefix' => '+380',
+				'#states'       => array(
+			  	'visible' => array(
+			  		':input[name="step1[marital_status]"]' => array('value' => 1),
+			  	),
+				),
+			);
+			if (isset($form_state['values']['step1']['phone_helpmate'])) {
+        $form['step1']['phone_helpmate']['#default_value'] = $form_state['values']['step1']['phone_helpmate'];
+      }
+			break;
+		case 2:
+			$form['step2'] = array(
+				'#type' => 'fieldset',
+				'#title' => t('Second step'),
+			);
+			$default_value = empty($form_state['values']['step2']['fio2']) ? '' : $form_state['values']['step2']['fio2'];
+			$form['step2']['fio2'] = array(
+				'#type'        => 'textfield',
+				'#title'       => t('Name2:'),
+				'#size'        => 40,
+		    '#description' => t("Name, Surname, Fathers name"),
+		    '#maxlength'   => 50,
+		    '#default_value' => $default_value, 
+			);
+			break;
+	}
+
+	
+	$form['actions'] = array('#type' => 'actions');
+	if ($step == 1) {
+		$form['actions']['next'] = array(
+			'#type'  => 'submit',
+			'#value' => t('Next'),
+			'#ajax'  => array(
+        'wrapper'  => 'my-module-form-wrapper', 
+        'callback' => 'my_module_ajax_callback',
+      ),
+		);
+	}
+	if ($step == 2) {
+		$form['actions']['submit'] = array(
+			'#type'  => 'submit',
+			'#value' => t('Checking'),
+		);
+		$form['actions']['prev'] = array(
+			'#type' => 'submit',
+			'#value' => t('Previous'),
+			'#limit_validation_errors' => array(),
+      '#submit' => array('my_module_form_submit'), 
+      '#ajax' => array(
+        'wrapper'  => 'my-module-form-wrapper', 
+        'callback' => 'my_module_ajax_callback',
+			),
+		);
+	}
+	return $form;
+}
+
+function my_module_ajax_callback($form, $form_state) {
+	return $form;
+}
+/**
+ * Validate function for two_step_form.
+ */
+// function my_module_form_validate($form, &$form_state) {
+//   if (!$form_state['values']['step1']['fio']) {
+//   	form_set_error('fio', t('Please enter your Name, Surname, Fathers name'));
+//   }
+// 	if (str_word_count($form_state['values']['step1']['fio']) < 3) {
+//     form_set_error('fio', t('Value is wrong.'));
+//   }
+//   if (!empty($form_state['values']['step1']['phone']) && !is_numeric($form_state['values']['phone'])) {
+//   	form_set_error('phone', t('Phone number must be numeric'));
+//   }
+// 	if (!empty($form_state['values']['step1']['phone']) && strlen($form_state['values']['phone']) != 9) {
+//     form_set_error('phone', t('Must be 9 figures'));
+//   }
+// }
+/**
+ * Submit function for two_step_form.
+ */
+function my_module_form_submit($form, &$form_state) {
+	$current_step = 'step' . $form_state['storage']['step'];
+	if (!empty($form_state['values'][$current_step])) {
+		$form_state['storage']['values'][$current_step] = $form_state['values'][$current_step];
+	}
+
+	if (isset($form['actions']['next']['#value']) && $form_state['triggering_element']['#value'] == $form['actions']['next']['#value']) {
+		$form_state['storage']['step']++;
+		$step_name = 'step' . $form_state['storage']['step'];
+		if (!empty($form_state['storage']['values'][$step_name])) {
+			$form_state['values'][$step_name] = $form_state['storage']['values'][$step_name];
+		}
+	}
+	if (isset($form['actions']['prev']['#value']) && $form_state['triggering_element']['#value'] == $form['actions']['prev']['#value']) {
+		$form_state['storage']['step']--;
+		$step_name = 'step' . $form_state['storage']['step'];
+		$form_state['values'][$step_name] = $form_state['storage']['values'][$step_name];
+	}
+
+	if (isset($form['actions']['submit']['#value']) && $form_state['triggering_element']['#value'] == $form['actions']['submit']['#value']) {
+		$message = 'Entered information:<br/>';
+		foreach ($form_state['storage']['values'] as $step => $values) {
+			foreach ($values as $key => $value) {
+				$output = '';
+				if (is_array($value)) {
+					foreach ($value as $val) {
+						$output .= $val ? $val . '; ' : '';
+					}
+					$value = implode(', ', $value);
+				}
+				else {
+					$output = $value;
+				}
+				$message .= "$key = $output <br/>";
+			}
+		}
+		drupal_set_message($message);
+		$form_state['rebuild'] = FALSE;
+		return;
+	}
+$form_state['rebuild'] = TRUE;
+}
+
+
+
+
+
+
+
+
+
