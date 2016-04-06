@@ -1,5 +1,5 @@
 ; &Id:$
 name = Mentor
-description = This is my module.
+description = Module for mentor's tasks
 version = 7.x-dev
 core = 7.x
