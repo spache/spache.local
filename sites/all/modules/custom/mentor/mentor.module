@@ -18,21 +18,17 @@ function mentor_menu() {
  */
 function mentor_counter($start = 0) {
 	$call_count = &drupal_static(__FUNCTION__);
-	if (!isset($call_count)) {
-		$call_count = $start;
-		$call_count++;
-		return $call_count;
-	}
-	$call_count++;
-	if ($start == 0) {
-
-	}
-	return $call_count;
+  if (!isset($call_count[$start])) {
+    $call_count[$start] = $start;
+  }
+  $call_count[$start]++;
+	return $call_count[$start];
 }
 
 function mentor_callback() {
 	drupal_set_message(mentor_counter(10));
-	for ($i = 1; $i <= 100; $i++) {
+	
+  for ($i = 1; $i <= 99; $i++) {
 		mentor_counter();
 	}
 	drupal_set_message(mentor_counter());
@@ -41,11 +37,4 @@ function mentor_callback() {
 	drupal_set_message(mentor_counter(10));
 	return '';
 }
-
-
-
-
-
-
-
 
