@@ -14,7 +14,27 @@ function mentor_menu() {
 }
 
 /**
- * Build form function.
+ * Function for call counting.
+ */
+function mentor_callback() {
+  $call_count = &drupal_static('mentor_counter');
+	mentor_counter(10);
+  drupal_set_message($call_count[10]);
+
+	while (!isset($call_count[0]) || $call_count[0] != 100) {
+		mentor_counter();
+	}
+  drupal_set_message($call_count[0]);
+
+	mentor_counter(10);
+	mentor_counter(10);
+  drupal_set_message($call_count[10]);
+
+  return '';
+}
+
+/**
+ * Callback function for static-example page.
  */
 function mentor_counter($start = 0) {
 	$call_count = &drupal_static(__FUNCTION__);
@@ -22,19 +42,4 @@ function mentor_counter($start = 0) {
     $call_count[$start] = $start;
   }
   $call_count[$start]++;
-	return $call_count[$start];
 }
-
-function mentor_callback() {
-	drupal_set_message(mentor_counter(10));
-	
-  for ($i = 1; $i <= 99; $i++) {
-		mentor_counter();
-	}
-	drupal_set_message(mentor_counter());
-
-	mentor_counter(10);
-	drupal_set_message(mentor_counter(10));
-	return '';
-}
-
