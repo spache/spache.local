@@ -1,0 +1,25 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the mentor_vimeo module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function mentor_vimeo_field_schema($field) {
+  $columns = array(
+    'field_vimeo' => array(
+      'type' => 'int',
+      'unsigned' => TRUE, 
+      'not null' => TRUE,
+    ),
+  );
+  $indexes = array(
+    'field_vimeo' => array('field_vimeo'),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+}

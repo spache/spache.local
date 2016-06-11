@@ -1,0 +1,129 @@
+<?php
+/**
+ * @file
+ * An example field using the Field Types API.
+ */
+
+/**
+ * Implements hook_field_info().
+ *
+ * Provides the description of the field.
+ */
+function mentor_vimeo_field_info() {
+  return array(
+    'field_vimeo' => array(
+      'label' => t('Vimeo video field'),
+      'description' => t('Description'),
+      'default_widget' => 'field_mentor_vimeo_widget',
+      'default_formatter' => 'field_mentor_vimeo_formatter',
+    ),
+  );
+}
+
+///**
+// * Implements hook_field_validate().
+// */
+// function mentor_vimeo_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+//   foreach ($items as $delta => $item) {
+//     if (!empty($item['field_vimeo'])) {
+//       if (FALSE) {
+//         $errors[$field['field_name']][$langcode][$delta][] = array(
+//           'error' => 'field_vimeo_invalid',
+//           'message' => t('Color must be in the HTML format #abcdef.'),
+//         );
+//       }
+//     }
+//   }
+// }
+
+
+ /**
+  * Implements hook_field_is_empty().
+  */
+function mentor_vimeo_field_is_empty($item, $field) {
+  return empty($item['field_vimeo']);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function mentor_vimeo_field_formatter_info() {
+  return array(
+    // This formatter just displays the hex value in the color indicated.
+    'field_mentor_vimeo_formatter' => array(
+      'label' => t('Simple text-based formatter'),
+      'field types' => array('field_vimeo'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function mentor_vimeo_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+	$element = array();
+  switch ($display['type']) {
+
+    case 'field_mentor_vimeo_formatter':
+      foreach ($items as $delta => $item) {
+      	if ($item['field_vimeo'])
+        $element[$delta] = array(
+
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#value' => "<iframe src=\"//player.vimeo.com/video/" . $item['field_vimeo'] . '\" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
+        );
+      }
+      break;
+
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function mentor_vimeo_field_widget_info() {
+  return array(
+    'field_mentor_vimeo_widget' => array(
+      'label' => t('Vimeo code'),
+      'field types' => array('field_vimeo'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function mentor_vimeo_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  switch ($instance['widget']['type']) {
+
+    case 'field_mentor_vimeo_widget':
+      $element['field_vimeo'] = array(
+        '#type' => 'textfield',
+        '#title' => $element['#title'],
+        '#default_value' => '11111111',
+        '#size' => 8,
+        '#maxlength' => 8,
+        '#delta' => $delta,
+      );
+      break;
+  }
+
+  return $element;
+}
+
+
+
+/**
+ * Implements hook_field_widget_error().
+ */
+// function mentor_vimeo_field_widget_error($element, $error, $form, &$form_state) {
+//   switch ($error['error']) {
+//     case 'field_vimeo_invalid':
+//       form_error($element, $error['message']);
+//       break;
+//   }
+// }
