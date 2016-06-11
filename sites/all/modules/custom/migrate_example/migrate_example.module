@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Integrates client-side editors with Drupal.
+ */
+
+/**
+ * Implements hook_migrate_api().
+ */
+function migrate_example_migrate_api() {
+  $api = array(
+    'api' => 2,
+    'groups' => array(
+      'freeday' => array(
+        'title' => 'Freeday',
+      ),
+    ),
+    'migrations' => array(
+      'Video' => array(
+        'class_name' => 'VideoContentMigration',
+        'group_name' => 'freeday',
+      ),
+    ),
+  );
+  return $api;
+}

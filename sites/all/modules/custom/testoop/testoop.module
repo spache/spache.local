@@ -1,0 +1,151 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function testoop_menu() {
+  $items = array();
+
+  $items['testoop'] = array(
+    'page callback' => 'testoop_callback',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+
+/**
+ * Callback function for testoop menu
+ */
+function testoop_callback () {
+  // class A {
+  //   function example() {
+  //     echo "Это первоначальная функция A::example().<br>";
+  //   }
+  // }
+
+  // class B extends A {
+  //   function example() {
+  //     echo "Это переопределенная функция B::example().<br>";
+  //     A::example();
+  //   }
+  // }
+  // $b = new B;
+  // $b->example();
+
+  // class MyClass {
+  //   protected function myFunc() {
+  //     echo "MyClass::myFunc()\n";
+  //   }
+  // }
+
+  // class OtherClass extends MyClass {
+  //   /* Override parent's definition */
+  //   public function myFunc() {
+  //     /* But still call the parent function */
+  //     // parent::myFunc();
+  //     echo "OtherClass::myFunc()\n";
+  //   }
+  // }
+  // $class = new OtherClass();
+  // $class->myFunc();
+
+  // class A {
+  //   // Создаем новый метод:
+  //   function Test() {
+  //     echo "<h1>Hello!</h1>";
+  //   }
+  // }
+
+  // // Создаем объект класса A:
+  // $a=new A();
+  // // Ссылка на объект класса A:
+  // $b=& new A();
+  // $b->Test();
+
+
+
+
+
+
+// class GuestBook { 
+//   private $name; 
+//   private $email; 
+//   private $msg; 
+   
+//   public function __construct($name, $email, $msg) { 
+//     $this->name = $name; 
+//     $this->email = $email; 
+//     $this->msg = $msg; 
+//   } 
+
+//   public function getName() { 
+//     return $this->name; 
+//   } 
+//   public function getEmail() { 
+//     return $this->email; 
+//   } 
+//   public function getMsg() { 
+//     return $this->msg; 
+//   } 
+// } 
+
+
+  class MyClass {
+    public $prop1 = "Class property ";
+    public static $count = 0;
+    
+    public function __construct() {
+      echo 'Created object "', __CLASS__, '"!<br />';
+    }
+
+    public function __destruct() {
+      echo 'Class object  "', __CLASS__, '" is deleted.<br />';
+    }
+
+    public function __toString() {
+      echo "Used method  toString: ";
+      return $this->getProperty();
+    }
+
+    public function setProperty($newval) {
+      $this->prop1 = $newval;
+    }
+
+    protected function getProperty() {
+      return $this->prop1 . "<br />";
+    }
+    public static function plusOne() {
+      return "count = " . ++self::$count . ".<br />";
+    }
+
+  }
+
+  class MyOtherClass extends MyClass {
+
+    public function __construct() {
+      parent::__construct(); 
+      echo "New construct in class " . __CLASS__ . ".<br />";
+    }
+
+    public function newMethod() {
+      echo "From new class method " . __CLASS__ . ".<br />";
+    }
+  }
+
+  $newobj = new MyOtherClass;
+
+  // echo $newobj->newMethod();
+  // echo $newobj->getProperty();
+
+do {
+  echo MyClass::plusOne();
+} while ( MyClass::$count < 10 );
+
+ 
+
+
+
+
+}
