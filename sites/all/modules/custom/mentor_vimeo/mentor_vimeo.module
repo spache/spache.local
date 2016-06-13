@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Created new field_vimeo type using the Field Types API.
+ * Created new mentor_vimeo_field type using the Field Types API.
  */
 
 /**
@@ -11,11 +11,11 @@
  */
 function mentor_vimeo_field_info() {
   return array(
-    'field_vimeo' => array(
+    'mentor_vimeo_field' => array(
       'label' => t('Vimeo video field'),
       'description' => t('Description'),
-      'default_widget' => 'field_mentor_vimeo_widget',
-      'default_formatter' => 'field_mentor_vimeo_formatter',
+      'default_widget' => 'mentor_vimeo_field_widget',
+      'default_formatter' => 'mentor_vimeo_field_formatter',
     ),
   );
 }
@@ -27,18 +27,14 @@ function mentor_vimeo_field_info() {
 */
 function mentor_vimeo_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
-    if (!empty($item['field_vimeo'])) {
-      $json_url = 'https://vimeo.com/api/oembed.json?url=' . rawurlencode($item['field_vimeo']);
-      $oembed = json_decode(mentor_vimeo_curl_get($json_url));
-      if (!isset($oembed->video_id)) {
+    if (!empty($item['mentor_vimeo_field'])) {
+      $json_url = url('https://vimeo.com/api/oembed.json', array('query' => array('url' => rawurlencode($item['mentor_vimeo_field']))));
+      $vimeo_video_id = mentor_vimeo_curl_get($json_url, FALSE);
+      if (!isset($vimeo_video_id)) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'field_vimeo_invalid',
-          'message' => t('Wrong url'),
+          'error' => 'mentor_vimeo_field_invalid',
+          'message' => t('Wrong vimeo url'),
         );
-      }
-      else {
-        $video_id = &drupal_static('video_id');
-        $video_id = $oembed->video_id;
       }
     }
   }
@@ -49,7 +45,7 @@ function mentor_vimeo_field_validate($entity_type, $entity, $field, $instance, $
   * Implements hook_field_is_empty().
   */
 function mentor_vimeo_field_is_empty($item, $field) {
-  return empty($item['field_vimeo']);
+  return empty($item['mentor_vimeo_field']);
 }
 
 /**
@@ -57,9 +53,9 @@ function mentor_vimeo_field_is_empty($item, $field) {
  */
 function mentor_vimeo_field_formatter_info() {
   return array(
-    'field_mentor_vimeo_formatter' => array(
+    'mentor_vimeo_field_formatter' => array(
       'label' => t('Video thumbnail player'),
-      'field types' => array('field_vimeo'),
+      'field types' => array('mentor_vimeo_field'),
     ),
   );
 }
@@ -70,23 +66,34 @@ function mentor_vimeo_field_formatter_info() {
 function mentor_vimeo_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
 	$element = array();
   switch ($display['type']) {
-    case 'field_mentor_vimeo_formatter':
+    case 'mentor_vimeo_field_formatter':
       foreach ($items as $delta => $item) {
-      	if ($item['field_vimeo'])
+      	if ($item['mentor_vimeo_field'])
         $element[$delta] = array(
           '#type' => 'container',
           '#attributes' => array('class' => 'vimeo_field_wrapper'),
-          '0' => array(
-            '#type' => 'html_tag',
-            '#tag' => 'div',
+          'iframe_container' => array(
+            '#type' => 'container',
             '#attributes' => array('class' => 'vimeo_field_video'),
-            '#value' => "<iframe src=\"//player.vimeo.com/video/" . $item['field_vimeo'] . '\" height="200px  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
+            'iframe' => array(
+              '#type' => 'html_tag',
+              '#tag' => 'iframe',
+              '#value' => '',
+              '#attributes' => array(
+                'src' => "//player.vimeo.com/video/" . $item['mentor_vimeo_field'],
+                'height' => '200px',
+                'frameborder' => '0',
+                'webkitallowfullscreen' => '',
+                'mozallowfullscreen' => '',
+                'allowfullscreen' => '',
+              ),
+            ),
           ),
-          '1' => array(
+          'span' => array(
             '#type' => 'html_tag',
             '#tag' => 'span',
             '#attributes' => array('class' => 'vimeo_field_url'),
-            '#value' => l('https://vimeo.com/' . $item['field_vimeo'], 'https://vimeo.com/' . $item['field_vimeo'], array('attributes' => array('target'=>'_blank'))),
+            '#value' => l('https://vimeo.com/' . $item['mentor_vimeo_field'], 'https://vimeo.com/' . $item['mentor_vimeo_field'], array('attributes' => array('target'=>'_blank'))),
           ),
         );
       }
@@ -100,9 +107,9 @@ function mentor_vimeo_field_formatter_view($entity_type, $entity, $field, $insta
  */
 function mentor_vimeo_field_widget_info() {
   return array(
-    'field_mentor_vimeo_widget' => array(
+    'mentor_vimeo_field_widget' => array(
       'label' => t('Vimeo video url'),
-      'field types' => array('field_vimeo'),
+      'field types' => array('mentor_vimeo_field'),
     ),
   );
 }
@@ -111,17 +118,15 @@ function mentor_vimeo_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function mentor_vimeo_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  if ($instance['widget']['type'] == 'field_mentor_vimeo_widget') {
-    $element['field_vimeo'] = array(
+  if ($instance['widget']['type'] == 'mentor_vimeo_field_widget') {
+    $element['mentor_vimeo_field'] = array(
       '#type' => 'textfield',
       '#title' => $element['#title'],
-      '#default_value' => isset($items[$delta]['field_vimeo']) ? 'https://vimeo.com/' . $items[$delta]['field_vimeo'] : '',
+      '#default_value' => isset($items[$delta]['mentor_vimeo_field']) ? 'https://vimeo.com/' . $items[$delta]['mentor_vimeo_field'] : '',
       '#size' => 60,
       '#delta' => $delta,
+      '#required' => 1,
     );
-  }
-  if ($instance['required'] == 1) {
-    $element['field_vimeo']['#required'] = 1;
   }
   return $element;
 }
@@ -133,7 +138,8 @@ function mentor_vimeo_field_widget_form(&$form, &$form_state, $field, $instance,
  */
 function mentor_vimeo_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   foreach ($items as $delta => $item) {
-    $items[$delta]['field_vimeo'] = drupal_static('video_id');
+    $json_url = url('https://vimeo.com/api/oembed.json', array('query' => array('url' => rawurlencode($items[$delta]['mentor_vimeo_field']))));
+    $items[$delta]['mentor_vimeo_field'] = mentor_vimeo_curl_get($json_url, TRUE);
   }
 }
 
@@ -141,7 +147,7 @@ function mentor_vimeo_field_presave($entity_type, $entity, $field, $instance, $l
  * Implements hook_field_widget_error().
  */
 function mentor_vimeo_field_widget_error($element, $error, $form, &$form_state) {
-  if ($error['error'] == 'field_vimeo_invalid') {
+  if ($error['error'] == 'mentor_vimeo_field_invalid') {
     form_error($element, $error['message']);
   }
 }
@@ -149,12 +155,16 @@ function mentor_vimeo_field_widget_error($element, $error, $form, &$form_state) 
 /**
  * Get vimeo video id by url.
  */
-function mentor_vimeo_curl_get($url) {
-  $curl = curl_init($url);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-  $vimeo_json = curl_exec($curl);
-  curl_close($curl);
-  return $vimeo_json;
+function mentor_vimeo_curl_get($url, $reset) {
+  $vimeo_json_object = &drupal_static(__FUNCTION__, NULL, $reset);
+  if (!isset($vimeo_json)) {
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    $vimeo_json = curl_exec($curl);
+    curl_close($curl);
+    $vimeo_json_object = json_decode($vimeo_json);
+  }
+  return $vimeo_json_object->video_id;
 }

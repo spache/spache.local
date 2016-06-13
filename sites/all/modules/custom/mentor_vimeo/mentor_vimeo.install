@@ -9,14 +9,14 @@
  */
 function mentor_vimeo_field_schema($field) {
   $columns = array(
-    'field_vimeo' => array(
+    'mentor_vimeo_field' => array(
       'type' => 'int',
       'unsigned' => TRUE, 
       'not null' => TRUE,
     ),
   );
   $indexes = array(
-    'field_vimeo' => array('field_vimeo'),
+    'mentor_vimeo_field' => array('mentor_vimeo_field'),
   );
   return array(
     'columns' => $columns,
